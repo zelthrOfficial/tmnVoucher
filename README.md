@@ -1,6 +1,6 @@
-# tmnVoucher (src-only)
+# tmnVoucher
 
-Redeem TrueMoney gift vouchers straight from Node. No package, no build, no comments — just `src/` + `test/`.
+Redeem TrueMoney gift vouchers straight from Node.
 
 [ไทย](README.th.md) - **English**
 
@@ -63,4 +63,4 @@ npx --no-install vitest run     # 64 tests, no network
 npx --no-install tsc --noEmit   # typecheck
 ```
 
-Node ≥ 18. MIT © 2026 Zelthr Studio — see [LICENSE](LICENSE).
+Node ≥ 18. MIT © 2026 zelthrStudio — see [LICENSE](LICENSE).

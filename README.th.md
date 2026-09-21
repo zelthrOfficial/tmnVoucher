@@ -1,6 +1,6 @@
-# tmnVoucher (src-only)
+# tmnVoucher
 
-redeem gift TrueMoney จาก Node โดยตรง ไม่มี package ไม่มี build ไม่มี comment — มีแค่ `src/` + `test/`
+redeem gift TrueMoney จาก Node โดยตรง
 
 **ไทย** - [English](README.md)
 
@@ -63,4 +63,4 @@ npx --no-install vitest run     # 64 ข้อ ไม่แตะเน็ต
 npx --no-install tsc --noEmit   # ตรวจ type
 ```
 
-Node ≥ 18 MIT © 2026 Zelthr Studio — ดู [LICENSE](LICENSE)
+Node ≥ 18 MIT © 2026 zelthrStudio — ดู [LICENSE](LICENSE)
