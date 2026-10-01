@@ -66,7 +66,12 @@ export const tmnVoucher = Object.assign(redeemWithDefaults, {
     redeem: redeemWithDefaults,
     create: createTmnVoucher,
     configure(options?: TmnVoucherOptions): void {
+        const previous = defaultClient;
         defaultClient = new TmnVoucher(options);
+        if (previous) {
+            // Release the replaced client's transport (child process); close() waits for its in-flight requests.
+            previous.close().catch(() => undefined);
+        }
     },
     async close(): Promise<void> {
         const client = defaultClient;

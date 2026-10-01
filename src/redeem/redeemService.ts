@@ -61,7 +61,12 @@ export class RedeemService {
 
         const promise = this.doRedeem(code, phone, key);
         this.inflight.set(key, promise);
-        promise.then(() => this.inflight.delete(key), () => this.inflight.delete(key));
+        const settle = (): void => {
+            if (this.inflight.get(key) === promise) {
+                this.inflight.delete(key);
+            }
+        };
+        promise.then(settle, settle);
         return promise;
     }
 
