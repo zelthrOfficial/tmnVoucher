@@ -44,11 +44,16 @@ function normalizeAmount(amount: number | string | undefined): number | undefine
     if (amount === undefined || amount === null) {
         return undefined;
     }
-    const value = typeof amount === 'string' ? Number(amount.trim().replace(/,/g, '')) : amount;
+    const value = typeof amount === 'string' ? parseDecimal(amount) : amount;
     if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
         throw new TmnVoucherValidationError('amount', 'amount must be a positive number of THB');
     }
     return round2(value);
+}
+
+function parseDecimal(raw: string): number {
+    const text = raw.trim().replace(/,/g, '');
+    return /^(\d+\.?\d*|\.\d+)$/.test(text) ? Number(text) : Number.NaN;
 }
 
 let defaultClient: TmnVoucher | undefined;

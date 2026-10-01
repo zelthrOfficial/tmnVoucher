@@ -108,6 +108,22 @@ describe('TmnVoucher.redeem — amount guard', () => {
     });
 });
 
+describe('TmnVoucher.redeem — amount string parsing', () => {
+    it.each(['50', ' 50 ', '50.00', '1,000.50', '.5', '50.'])('accepts the plain decimal string %j', async (amount) => {
+        const transport = new MockTransport(() => json(successEnvelope(Number(amount.trim().replace(/,/g, '')))));
+        await expect(clientWith(transport).redeem(PHONE, CODE, amount)).resolves.toMatchObject({ ok: true });
+    });
+
+    it.each(['0x10', '1e3', '0b11', 'Infinity', 'NaN', '', '  ', '5 0', '--5', '5abc'])(
+        'rejects the non-decimal string %j before any request',
+        async (amount) => {
+            const transport = new MockTransport(() => json(successEnvelope(50)));
+            await expect(clientWith(transport).redeem(PHONE, CODE, amount)).rejects.toMatchObject({ code: 'INVALID_AMOUNT' });
+            expect(transport.calls).toHaveLength(0);
+        },
+    );
+});
+
 describe('TmnVoucher.redeem — caching and single-flight', () => {
     it('replays a success from cache without a second upstream call', async () => {
         const transport = new MockTransport(() => json(successEnvelope(50)));
