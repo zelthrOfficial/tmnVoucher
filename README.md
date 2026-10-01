@@ -59,8 +59,9 @@ All extend `TmnVoucherError` with a stable `.code`: `INVALID_PHONE` · `INVALID_
 ## Test
 
 ```bash
-npx --no-install vitest run     # 64 tests, no network
-npx --no-install tsc --noEmit   # typecheck
+npm ci                          # dev dependencies (package.json is only a dev harness)
+npm test                        # unit tests + CycleTLS integration tests (127.0.0.1 only, no external network)
+npm run typecheck
 ```
 
 Node ≥ 18. MIT © 2026 zelthrStudio — see [LICENSE](LICENSE).

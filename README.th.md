@@ -59,8 +59,9 @@ await client.close();
 ## ทดสอบ
 
 ```bash
-npx --no-install vitest run     # 64 ข้อ ไม่แตะเน็ต
-npx --no-install tsc --noEmit   # ตรวจ type
+npm ci                          # dev dependencies (package.json ใช้สำหรับ dev เท่านั้น)
+npm test                        # unit test + integration test กับ CycleTLS จริง (เฉพาะ 127.0.0.1 ไม่ออกเน็ต)
+npm run typecheck               # ตรวจ type
 ```
 
 Node ≥ 18 MIT © 2026 zelthrStudio — ดู [LICENSE](LICENSE)
