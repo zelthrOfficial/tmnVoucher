@@ -1,9 +1,9 @@
 import { createRequire } from 'node:module';
-import { promises as fs } from 'node:fs';
 import * as net from 'node:net';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import initCycleTLS, { type CycleTLSClient, type CycleTLSResponse } from 'cycletls';
+import { prepareWritableBinary } from './binary';
 import { CookieJar } from './cookieJar';
 import { TmnVoucherError } from '../errors';
 import type { TmnHttpRequest, TmnHttpResponse, TmnLogLevel, TmnTransport, TmnVoucherOptions } from '../types';
@@ -153,15 +153,11 @@ export class CycletlsTransport implements TmnTransport {
             return undefined;
         }
         try {
-            const dest = path.join(os.tmpdir(), `tmnvoucher-${binary}`);
-            try {
-                await fs.access(dest, fs.constants.X_OK);
-                return dest;
-            } catch {
-                await fs.copyFile(path.join(path.dirname(createRequire(import.meta.url).resolve('cycletls')), binary), dest);
-                await fs.chmod(dest, 0o755);
-                return dest;
-            }
+            return await prepareWritableBinary(
+                path.join(path.dirname(createRequire(import.meta.url).resolve('cycletls')), binary),
+                os.tmpdir(),
+                binary,
+            );
         } catch (err) {
             this.onLog?.(
                 'debug',
