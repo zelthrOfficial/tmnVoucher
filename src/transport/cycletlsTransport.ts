@@ -49,9 +49,18 @@ export class CycletlsTransport implements TmnTransport {
             'post',
         );
 
-        this.jar.set(resp.headers['set-cookie'], 'gift.truemoney.com');
+        const headers: Record<string, unknown> = resp.headers ?? {};
+        const body = this.normalizeBody(resp);
 
-        return { status: resp.status, headers: resp.headers, body: this.normalizeBody(resp) };
+        const failure = describeTransportFailure(resp.status, headers, body);
+        if (failure) {
+            this.onLog?.('error', `transport request failed: ${failure.message}`);
+            throw new TmnVoucherError(failure.code, `redeem request failed: ${failure.message}`);
+        }
+
+        this.jar.set(findHeader(headers, 'set-cookie'), 'gift.truemoney.com');
+
+        return { status: resp.status, headers, body };
     }
 
     async close(): Promise<void> {
@@ -119,6 +128,41 @@ export class CycletlsTransport implements TmnTransport {
     private normalizeBody(resp: CycleTLSResponse): string {
         return (typeof resp.data === 'string' ? resp.data : String(resp.data ?? '')).slice(0, this.options.maxBodyBytes ?? (2 << 20));
     }
+}
+
+function findHeader(headers: Record<string, unknown>, name: string): unknown {
+    for (const key of Object.keys(headers)) {
+        if (key.toLowerCase() === name) {
+            return headers[key];
+        }
+    }
+    return undefined;
+}
+
+// CycleTLS resolves (instead of rejecting) when a request fails before an HTTP response exists:
+// timeout -> 408, dial/TLS errors -> other 4xx/5xx, always with empty headers and the Go error text as body.
+// A genuine upstream response always carries headers, so "no headers + error status" means transport failure.
+function describeTransportFailure(
+    status: unknown,
+    headers: Record<string, unknown>,
+    body: string,
+): { code: 'TIMEOUT' | 'TRANSPORT_ERROR'; message: string } | undefined {
+    if (Object.keys(headers).length > 0 || (typeof status === 'number' && status > 0 && status < 400)) {
+        return undefined;
+    }
+    const message = redactVoucherPath(body.split('\n', 1)[0] ?? '')
+        .replace(/->\s*$/, '')
+        .trim()
+        .slice(0, 300);
+    const isTimeout = status === 408 || /deadline exceeded|timeout|timed out/i.test(body);
+    return {
+        code: isTimeout ? 'TIMEOUT' : 'TRANSPORT_ERROR',
+        message: message === '' ? `transport failed with status ${String(status)}` : message,
+    };
+}
+
+function redactVoucherPath(text: string): string {
+    return text.replace(/\/vouchers\/[^/\s"]+/g, '/vouchers/****');
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
