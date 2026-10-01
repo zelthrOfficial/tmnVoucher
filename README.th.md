@@ -64,4 +64,4 @@ npm test                        # unit test + integration test กับ CycleTL
 npm run typecheck               # ตรวจ type
 ```
 
-Node ≥ 18 MIT © 2026 zelthrStudio — ดู [LICENSE](LICENSE)
+Node ≥ 18 MIT © 2026 ByteInDev — ดู [LICENSE](LICENSE)
