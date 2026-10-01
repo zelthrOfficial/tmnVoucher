@@ -219,4 +219,4 @@ The integration tests start the real CycleTLS process but only talk to a server 
 
 ## License
 
-MIT, copyright 2026 ByteInDev. See [LICENSE](LICENSE).
+MIT, copyright 2026 @zelthrOfficial. See [LICENSE](LICENSE).
